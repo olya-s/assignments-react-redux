@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>table-unicode</title>
+</head>
+<body>
+	<script>
+		function createTr(code, parity){
+			let tr = document.createElement('tr');
+			let tr2 = document.createElement('tr');
+			for(let j = code, n = code < 100 ? code + 25 : code + 32; j < n; j++){
+				let td = document.createElement('td');
+				td.innerText = String.fromCharCode(j);
+				tr.appendChild(td);
+				let td2 = document.createElement('td');
+				td2.innerText = j;
+				tr2.appendChild(td2);
+			}
+			table.appendChild(tr);
+			table.appendChild(tr2);
+		}
+		var table = document.createElement('table');
+		table.border = 1;
+		createTr(65);
+		createTr(97);
+		createTr(1040);
+		createTr(1072);
+		document.body.appendChild(table);
+	</script>
+</body>
+</html>
