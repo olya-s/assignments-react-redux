@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Application</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+	<script src="galleria/galleria-1.5.7.min.js"></script>
+</head>
+<body>
+	<p>Just hello</p>
+	<input type="text" id="upload" value="/upload"><br>
+	<input type="file" id="file">
+	<a href="#" id="url"></a><br>
+	<div class="galleria"></div>
+	<script>
+		file.onchange = async () => {
+			url.innerHTML = url.href = "/" + await (await fetch(upload.value, {
+				method: "POST",
+				body: file.files[0]
+			})).text();
+		}
+		
+		Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
+		Galleria.run('.galleria');
+
+		fetch('/upload')
+		.then(res => res.json())
+		.then(data => {
+			for (let file of data){
+				let img = document.createElement('img');
+				img.src = "/upload/" + file;
+				document.querySelectorAll('.galleria')[0].appendChild(img);
+			}
+		})
+	</script>
+</body>
+</html>
