@@ -43,36 +43,59 @@
 .FormContainer {
   display: flex;
   justify-content: space-around;
-  padding: 20px;
+  padding: 20px 30px;
   border: 1px solid #48D1CC;
   border-radius: 10px;
+}
+
+.FormContainer input {
+  margin-right: 30px;
+}
+
+.FormContainer button {
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.FormContainer button:hover {
+  cursor: pointer;
+}
+
+#nickInput{
+  width: 20%;
+  min-width: 100px;
+}
+
+#messageInput{
+  width: 70%;
 }
 
 .Hist{
   height: auto;
   overflow: auto;
 }
+
 .Hist>div{      
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 }
+
 .Hist>div>div{
-  width: 30%;
-  margin: 10px 30px;
+  width: 10%;
+  min-width: 80px;
+  margin: 10px 30px 10px 0;
   padding: 10px;
   border: 1px solid #48D1CC;
   border-radius: 10px;
   background: #E0FFFF;
 }
-.Hist>div>div:last-child{
-  width: 70%;
-  margin-left: 0;
+
+.Hist>div>div:first-child{
+  margin-left: 30px;
 }
 
-#nickInput{
-  width: 20%;
-}
-#messageInput{
-  width: 70%;
+.Hist>div>div:last-child{
+  width: 80%;
+  margin-left: 0;
 }

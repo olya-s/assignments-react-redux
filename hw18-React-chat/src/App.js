@@ -6,26 +6,39 @@ class FormContainer extends React.Component{
   constructor(props){
     super(props);
     this.state = {nick: '', message: ''};
+
+    this.sendMessage = this.sendMessage.bind(this);
   }
+
+  sendMessage(){
+    fetch('/message', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify({nick: this.state.nick, message: this.state.message})
+        })
+        .then(res => {
+          if(res.status == 201){
+            this.setState({message: ''})
+          }
+        })
+  }
+  
   render(){
     return(
       <div className = "FormContainer">
         <input id="nickInput" type="text" value={this.state.nick} placeholder="nick"
           onChange={evt => this.setState({nick: evt.target.value})}/>
         <input id="messageInput" type="text" value={this.state.message} placeholder="message"
-          onChange={evt => this.setState({message: evt.target.value})}/>
-        <button onClick={() => {
-                  fetch('/message', {
-                        headers: {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json'
-                        },
-                        method: "POST",
-                        body: JSON.stringify({nick: this.state.nick, message: this.state.message})
-                    })
-                }}>
-                Send
-        </button>
+          onChange={evt => this.setState({message: evt.target.value})}
+          onKeyPress={evt => {
+            if(evt.charCode == 13){
+              this.sendMessage();
+            }
+          }}/>
+        <button onClick={this.sendMessage}>Send</button>
       </div>
     )
   }
