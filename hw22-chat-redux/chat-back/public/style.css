@@ -1,0 +1,42 @@
+#chat{
+	width: 75%;
+	background: #AFEEEE;
+	margin: 0 auto;
+	border: 1px solid #48D1CC;
+	border-radius: 10px;
+}
+#hist{
+	height: auto;
+	overflow: auto;
+}
+#hist>div{			
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+#hist>div>div{
+	width: 30%;
+	margin: 10px 30px;
+	padding: 10px;
+	border: 1px solid #48D1CC;
+	border-radius: 10px;
+	background: #E0FFFF;
+}
+#hist>div>div:last-child{
+	width: 70%;
+	margin-left: 0;
+}
+#formContainer{
+	display: flex;
+	justify-content: space-around;
+	padding: 20px;
+	border: 1px solid #48D1CC;
+	border-radius: 10px;
+}
+input{
+	width: 40%;
+}
+iframe {
+	display: block;
+	margin: 20px auto;
+}

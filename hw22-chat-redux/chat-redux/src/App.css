@@ -1,0 +1,105 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chat {
+  width: 75%;
+  background: #AFEEEE;
+  margin: 0 auto;
+  border: 1px solid #48D1CC;
+  border-radius: 10px;
+}
+
+.formContainer {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 30px;
+  border: 1px solid #48D1CC;
+  border-radius: 10px;
+}
+
+.formContainer input {
+  margin-right: 30px;
+}
+
+.formContainer button {
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.formContainer button:hover {
+  cursor: pointer;
+}
+
+#nickInput {
+  width: 20%;
+  min-width: 100px;
+}
+
+#messageInput {
+  width: 70%;
+}
+
+.history {
+  height: auto;
+  overflow: auto;
+}
+
+.history > div {      
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.history > div > div {
+  width: 10%;
+  min-width: 80px;
+  margin: 10px 30px 10px 0;
+  padding: 10px;
+  border: 1px solid #48D1CC;
+  border-radius: 10px;
+  background: #E0FFFF;
+}
+
+.history > div > div :first-child {
+  margin-left: 30px;
+}
+
+.history > div > div:last-child {
+  width: 80%;
+  margin-left: 0;
+}
+
+.loading {
+  text-align: center;
+}
