@@ -7,6 +7,8 @@ import {createStore, combineReducers, applyMiddleware} from 'redux';
 
 import thunk from 'redux-thunk'
 
+
+
 let chatReducer = (state, action) => {
   if(state === undefined){
     return {messages: [], mesId: ''}
