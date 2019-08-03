@@ -30,14 +30,15 @@ var chatRoomSchema = new Schema({
 var Message = mongoose.model('Message', messageSchema)
 var ChatRoom = mongoose.model('ChatRoom', chatRoomSchema)
 
-// let testChat = new ChatRoom({name: 'firstChat'})
-// testChat.save().then(() => console.log("saved"))
-// testChat = new ChatRoom({name: 'secondChat'})
-// testChat.save().then(() => console.log("saved2"))
-
 app.post('/message', async (req, res) => {
 	var message = new Message(req.body)
 	await message.save()
+	res.status(201).send(req.body)
+})
+
+app.post('/createChat', async (req, res) => {
+	var newChat = new ChatRoom(req.body)
+	await newChat.save()
 	res.status(201).send(req.body)
 })
 

@@ -7,8 +7,6 @@ import {createStore, combineReducers, applyMiddleware} from 'redux';
 
 import thunk from 'redux-thunk'
 
-
-
 let chatReducer = (state, action) => {
   if(state === undefined){
     return {messages: [], mesId: ''}
@@ -30,8 +28,8 @@ let chatRooms = (state, action) => {
     return {chatRooms: []}
   }
   if(action.type === 'ROOMS'){
-    if(action.status === 'RESOLVED'){
-      return {...state, chatRooms: [...state.chatRooms, ...action.payload]}
+    if(action.status == 'RESOLVED'){
+      return {...state, chatRooms: [...action.payload]}
     }
   }
   return state
@@ -48,7 +46,7 @@ let currentChatRoom = (state, action) => {
 }
 
 let newMessage = (state, action) => {
-  if(state === undefined){
+  if(state == undefined){
     return {status: '', newMes: {}}
   }
   if(action.type === 'MESSAGE_SENDING' || action.type === 'MESSAGE_SENT' || action.type === 'MESSAGE_FAIL'){
@@ -69,32 +67,41 @@ const reducers = combineReducers({
 
 const store = createStore(reducers, applyMiddleware(thunk))
 
-store.subscribe(() => store.getState())
+//store.subscribe(() => console.log("store",store.getState()))
 
-// const actionMessageSending = () => ({type: 'MESSAGE_SENDING', status: 'PENDING', payload: null, error: null})
-// const actionMessageSent    = payload => ({type: 'MESSAGE_SENT', status: 'RESOLVED', payload, error: null})
-// const actionMessageFail    = error => ({type: 'MESSAGE_FAIL', status: 'REJECTED', payload: null, error})
+const actionMessageSending = () => ({type: 'MESSAGE_SENDING', status: 'PENDING', payload: null, error: null})
 
-const actionNewMessage = (promise) => {
-  const actionMessageSending = () => ({type: 'MESSAGE_SENDING', status: 'PENDING', payload: null, error: null})
-  const actionMessageSent    = payload => ({type: 'MESSAGE_SENT', status: 'RESOLVED', payload, error: null})
-  const actionMessageFail    = error => ({type: 'MESSAGE_FAIL', status: 'REJECTED', payload: null, error})
-  return async function (dispatch){
-    dispatch(actionMessageSending())
-    try {
-      dispatch(actionMessageSent(await promise.then(res => res.json())))
-    }
-    catch (error) {
-      dispatch(actionMessageFail(error))
-    }
-  }
-}
+const actionMessageSent    = payload => ({type: 'MESSAGE_SENT', status: 'RESOLVED', payload, error: null})
+
+const actionMessageFail    = error => ({type: 'MESSAGE_FAIL', status: 'REJECTED', payload: null, error})
+
+// const actionNewMessage = (promise) => {
+//   const actionMessageSending = () => ({type: 'MESSAGE_SENDING', status: 'PENDING', payload: null, error: null})
+//   const actionMessageSent    = payload => ({type: 'MESSAGE_SENT', status: 'RESOLVED', payload, error: null})
+//   const actionMessageFail    = error => ({type: 'MESSAGE_FAIL', status: 'REJECTED', payload: null, error})
+//   return async function (dispatch){
+//     dispatch(actionMessageSending())
+//     try {
+//       dispatch(actionMessageSent(await promise.then(res => res.json())))
+//     }
+//     catch (error) {
+//       dispatch(actionMessageFail(error))
+//     }
+//   }
+// }
 
 function promiseActionsMaker(name, type){
   const actionPending     = () => ({ type: type, name, status: 'PENDING', payload: null, error: null })
   const actionResolved    = payload => ({ type: type, name, status: 'RESOLVED', payload, error: null })
   const actionRejected    = error => ({ type: type, name, status: 'REJECTED', payload: null, error })
 
+  // function actionPromiseThunk(){
+  //     return async dispatch => {
+  //         dispatch(actionPending())
+  //         let data = await promise.catch(e => dispatch(actionRejected(e)))
+  //         dispatch(actionResolved(data))
+  //     }
+  // }
   function actionFetch(promise){
     return async function (dispatch){
       dispatch(actionPending())
@@ -120,24 +127,59 @@ function actionCurrentRoom(data){
 class ChatRooms extends React.Component{
   constructor(props){
     super(props)
-    this.state = {rooms: [<option>loading...</option>]}
+    this.state = {newChat: '', rooms: []}
+    this.getChatRooms = this.getChatRooms.bind(this)
+    this.createNewChat = this.createNewChat.bind(this)
   }
 
-  componentWillMount(){
+  componentDidMount(){
+    this.getChatRooms()
+  }
+
+  getChatRooms(){
     let rooms = []
     this.props.actionChatRooms(fetch('/chatRooms'))
-    .then(() => {this.props.chatRooms.map(room => {rooms.push(<option roomid = {room._id}>{room.name}</option>)})
-      this.props.actionCurrentRoom(rooms[0].props.roomid)
+    .then(() => {
+      this.props.chatRooms.map(room => {
+        rooms.push(<option roomid = {room._id}>{room.name}</option>)
+      })
       this.setState({rooms: rooms})
+      this.state.rooms.length && this.props.actionCurrentRoom(this.state.rooms[0].props.roomid) 
     })
   }
 
-  render(){    
+  createNewChat(){
+    fetch('/createChat', {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method: "POST",
+          body: JSON.stringify({name: this.state.newChat})
+    })
+    .then(() => {this.setState({newChat: ''})
+      this.getChatRooms()
+    })    
+  }
+
+  render(){ 
     return (
-      <select onChange = {
-        evt => (this.state.rooms.map(room => room.props.children === evt.target.value && this.props.actionCurrentRoom(room.props.roomid)))}>
-        {this.state.rooms}
-      </select>
+      <div className = "chatRooms">
+        <input type = "text" value = {this.state.newChat} placeholder = "new chat"
+          onChange = {evt => this.setState({newChat: evt.target.value})}
+          onKeyPress = {evt => {
+            if(evt.charCode == 13){
+              this.createNewChat()
+            }
+          }} />
+        <button onClick = {this.createNewChat}
+          disabled = {!this.state.newChat ? 'disabled' : ''}>create Chat</button>
+        {!!this.state.rooms.length &&
+        <select onChange = {
+          evt => (this.state.rooms.map(room => room.props.children == evt.target.value && this.props.actionCurrentRoom(room.props.roomid)))}>
+          {this.state.rooms}
+        </select>}
+      </div>
     )
   }
 }
@@ -146,10 +188,10 @@ class FormContainer extends React.Component{
   constructor(props){
     super(props)
     this.state = {nick: '', message: ''}
-
+    console.log(props.chatRoomId)
     this.sendMessage = this.sendMessage.bind(this)
   }
-
+/*
   sendMessage(){
     this.props.actionNewMessage(
     fetch('/message', {
@@ -158,14 +200,14 @@ class FormContainer extends React.Component{
             'Content-Type': 'application/json'
           },
           method: "POST",
-          body: JSON.stringify({ ...this.state, chatRoomId:store.getState().currentChatRoom.chatRoomId })
+          body: JSON.stringify({ ...this.state, chatRoomId: this.props.chatRoomId })
       }))
     .then(() => {
-      let message = store.getState().newMessage.status === 'MESSAGE_SENT' ? '' : this.state.message
+      let message = store.getState().newMessage.status == 'MESSAGE_SENT' ? '' : this.state.message
       this.setState({message: message})
     })
   }
-/*
+*/
   sendMessage(){
     this.props.actionMessageSending()
     fetch('/message', {
@@ -174,12 +216,21 @@ class FormContainer extends React.Component{
           'Content-Type': 'application/json'
         },
         method: "POST",
-        body: JSON.stringify(this.state)
-    }))
-    .then(res => this.props.actionMessageSent())
-    .catch(err => this.props.actionMessageFail(err))
+        body: JSON.stringify({...this.state, chatRoomId: this.props.chatRoomId})
+    })
+    .then(res => {
+      if(res.status === 201)
+        this.props.actionMessageSent(res)
+      else
+        this.props.actionMessageFail(res)
+    })
+    //.catch(err => (console.log("catch"),this.props.actionMessageFail(err)))
+    .then(() => {
+      let message = store.getState().newMessage.status === 'MESSAGE_SENT' ? '' : this.state.message
+      this.setState({message: message})
+    })
   }
-*/
+
   render(){
     return(
       <div className = "formContainer">
@@ -191,7 +242,7 @@ class FormContainer extends React.Component{
           disabled = {this.props.newMessage === 'MESSAGE_SENDING' ? 'disabled' : ''}
           onChange = {evt => this.setState({message: evt.target.value})}
           onKeyPress = {evt => {
-            if(evt.charCode === 13){
+            if(evt.charCode == 13){
               this.sendMessage()
             }
           }}/>
@@ -220,19 +271,23 @@ let History = (props) => {
 }
 
 const Loading = p =>
-<div className = "loading">
-    <img src = "https://media0.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt = "Loading..."/>
+<div className = "loading">Loading...
+    {// <img src = "https://media0.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" />
+  }
 </div>
 
 class Chat extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {chatRooms: this.props.chatRooms}
+  }
 
   componentWillMount(){
-    store.subscribe(() => store.getState())
     setInterval(() => {
       let params = new URLSearchParams()
-      params.append('roomId', store.getState().currentChatRoom.chatRoomId)
-      params.append('id', store.getState().chat.mesId)
-      this.props.actionChat(fetch('/message/' + params.toString()))//'roomId='+store.getState().currentChatRoom.chatRoomId+'&id='+store.getState().chat.mesId))
+      params.append('roomId', this.props.chatRoomId)
+      params.append('id', this.props.mesId)
+      !!this.props.chatRoomId && this.props.actionChat(fetch('/message/' + params.toString()))//'roomId='+store.getState().currentChatRoom.chatRoomId+'&id='+store.getState().chat.mesId))
     }, 2000)
   }
 
@@ -246,13 +301,14 @@ class Chat extends React.Component {
       messages.push(<Message date = {date} nick = {msg.nick} msg = {msg.message}></Message>)
     })
     return (
-      <div>
+      <div>      
+        {!!this.props.chatRooms.length &&
         <div className = "chat">
           <FormContainer />
           <History>
             {messages}
           </History>
-        </div>
+        </div>}
         {!messages.length && <Loading />}
       </div>
     )
@@ -260,16 +316,16 @@ class Chat extends React.Component {
 }
 
 let mapStateToProps = state => ({
-  messages: store.getState().chat.messages,
-  mesId: store.getState().chat.mesId, 
-  chatRooms: store.getState().chatRooms.chatRooms,
-  chatRoomId: store.getState().currentChatRoom.chatRoomId,
-  newMessage: store.getState().newMessage.status
+  messages: state.chat.messages,
+  mesId: state.chat.mesId, 
+  chatRooms: state.chatRooms.chatRooms,
+  chatRoomId: state.currentChatRoom.chatRoomId,
+  newMessage: state.newMessage.status
 })
 
 let mapDispatchToProps = {actionChat, actionChatRooms, actionCurrentRoom}
 
-FormContainer = connect(mapStateToProps, {actionNewMessage})(FormContainer)//, actionMessageSending, actionMessageSent, actionMessageFail})(FormContainer)
+FormContainer = connect(mapStateToProps, {actionMessageSending, actionMessageSent, actionMessageFail})(FormContainer)
 
 Chat = connect(mapStateToProps, mapDispatchToProps)(Chat)
 
@@ -279,7 +335,7 @@ class App extends React.Component{
   render(){
     return(
       <Provider store = {store}>
-        <ChatRooms />
+        <ChatRooms />  
         <Chat />
       </Provider>
     )

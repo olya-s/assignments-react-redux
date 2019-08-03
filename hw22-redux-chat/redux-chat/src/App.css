@@ -34,30 +34,40 @@
 
 .chat {
   width: 75%;
-  background: #AFEEEE;
+  background: #E0FFFF;
   margin: 0 auto;
-  border: 1px solid #48D1CC;
+  border: 1px solid #AFEEEE;
   border-radius: 10px;
+}
+
+.chatRooms {
+  width: 75%;
+  margin: 0 auto;
+  padding: 20px 30px;
+}
+
+select {
+  margin-left: 30px;
 }
 
 .formContainer {
   display: flex;
   justify-content: space-around;
   padding: 20px 30px;
-  border: 1px solid #48D1CC;
+  border: 1px solid #AFEEEE;
   border-radius: 10px;
 }
 
-.formContainer input {
+input {
   margin-right: 30px;
 }
 
-.formContainer button {
+button {
   padding: 10px 20px;
   border-radius: 5px;
 }
 
-.formContainer button:hover {
+button:hover {
   cursor: pointer;
 }
 
@@ -84,15 +94,15 @@
 .history > div > div {
   width: 10%;
   min-width: 80px;
-  margin: 10px 30px 10px 0;
+  margin: 5px 10px 5px 0;
   padding: 10px;
-  border: 1px solid #48D1CC;
-  border-radius: 10px;
-  background: #E0FFFF;
+  border: 1px solid #AFEEEE;
+  border-radius: 5px;
+  background: #FFFAFA;
 }
 
-.history > div > div :first-child {
-  margin-left: 30px;
+.history > div > div:first-child {
+  margin-left: 10px;
 }
 
 .history > div > div:last-child {
